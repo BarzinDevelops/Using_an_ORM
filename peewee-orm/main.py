@@ -6,12 +6,17 @@ __winc_id__ = "286787689e9849969c326ee41d8c53c4"
 __human_name__ = "Peewee ORM"
 
 
+def tester():
+    print(vegetarian_dishes())
+    
+    
 def cheapest_dish() -> models.Dish:
     """You want ot get food on a budget
 
     Query the database to retrieve the cheapest dish available
     """
-    ...
+    cheapest_dish_found = models.Dish.select().order_by(models.Dish.price_in_cents).first()
+    return cheapest_dish_found
 
 
 def vegetarian_dishes() -> List[models.Dish]:
@@ -20,7 +25,22 @@ def vegetarian_dishes() -> List[models.Dish]:
     Query the database to return a list of dishes that contain only
     vegetarian ingredients.
     """
-    ...
+    is_vegetarian_dish = None
+    
+    # step1: get all the dishes:
+    all_dishes = models.Dish.select()
+    
+    # Step 2 & 3: Check if ingredients are vegetarian:
+    vegetarian_dishes = []
+    for dish in all_dishes:      
+        is_vegetarian_dish = all(ingredient.is_vegetarian for ingredient in dish.ingredients)    
+        if is_vegetarian_dish:
+            vegetarian_dishes.append(dish)       
+    print(f"is_vegetarian_dish  => {is_vegetarian_dish}")
+    return vegetarian_dishes
+
+    
+    
 
 
 def best_average_rating() -> models.Restaurant:
@@ -59,3 +79,8 @@ def add_dish_to_menu() -> models.Dish:
     Return your newly created dish
     """
     ...
+
+
+
+if __name__ == "__main__":
+    tester()
