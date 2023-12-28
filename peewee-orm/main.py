@@ -1,15 +1,47 @@
 import models
-import peewee
+from models import db
+from peewee import fn, JOIN
 from typing import List
 
 __winc_id__ = "286787689e9849969c326ee41d8c53c4"
 __human_name__ = "Peewee ORM"
 
 
+def adding_dish():
+    # Define a dish to add
+    dishes_to_add = [
+        {"name": "Taboule", "served_at": 5, "price_in_cents": 1350},
+        {"name": "spaghetti bolognese", "served_at": 5, "price_in_cents": 1680},
+    ]
+    
+    for dish in dishes_to_add:
+        # Check if a dish with the same name already exists
+        existing_dish = models.Dish.select() \
+                        .where(
+                            (models.Dish.name == dish["name"]) & 
+                            (models.Dish.served_at == dish["served_at"])
+                        ).first()
+
+        if existing_dish:
+            print(f"Dish with the name '{dish['name']}' already exists.")
+        else:
+            # Create and add the new dish
+            new_dish = models.Dish.create(name=dish["name"], served_at=dish["served_at"], price_in_cents=dish["price_in_cents"])
+            print(f"New dish added successfully. Dish ID: {new_dish.id}")
+
 def tester():
-    print(vegetarian_dishes())
-    
-    
+    """ 
+    query = (models.Dish
+             .select(models.Dish, models.Restaurant.name.alias(alias='rest_name'))
+             .join(models.Restaurant, on=(models.Dish.served_at == models.Restaurant.id)))
+    print(f"dish_id\t\tname\t\t\tserved_at_id\tprice_in_cents\t\trestaurant_name")
+    for row in query.objects():       
+        print(f"\t{row.id}\t\t{row.name}\t\t{row.served_at_id}\t\t{row.price_in_cents}\t\t{row.rest_name}\t")
+     """
+    # adding_dish()
+    add_rating_to_restaurant()
+     
+     
 def cheapest_dish() -> models.Dish:
     """You want ot get food on a budget
 
@@ -17,7 +49,6 @@ def cheapest_dish() -> models.Dish:
     """
     cheapest_dish_found = models.Dish.select().order_by(models.Dish.price_in_cents).first()
     return cheapest_dish_found
-
 
 def vegetarian_dishes() -> List[models.Dish]:
     """You'd like to know what vegetarian dishes are available
@@ -39,17 +70,21 @@ def vegetarian_dishes() -> List[models.Dish]:
     print(f"is_vegetarian_dish  => {is_vegetarian_dish}")
     return vegetarian_dishes
 
-    
-    
-
-
 def best_average_rating() -> models.Restaurant:
     """You want to know what restaurant is best
 
     Query the database to retrieve the restaurant that has the highest
     rating on average
-    """
-    ...
+    """   
+    # Select restaurants and calculate the average rating for each
+    best_rated_restaurant = (models.Restaurant
+             .select(models.Restaurant, fn.AVG(models.Rating.rating).alias('avg_rating'))
+             .join(models.Rating, JOIN.LEFT_OUTER, on=(models.Restaurant.id == models.Rating.restaurant))
+             .group_by(models.Restaurant)
+             .order_by(fn.AVG(models.Rating.rating).desc())
+             .limit(1))
+
+    return best_rated_restaurant.first()
 
 
 def add_rating_to_restaurant() -> None:
@@ -57,7 +92,20 @@ def add_rating_to_restaurant() -> None:
 
     Select the first restaurant in the dataset and add a rating
     """
-    ...
+    restaurant = models.Restaurant.get_by_id(5)
+    print(f"restaurant reference: {restaurant}\n Restaurant name: {restaurant.name}")
+    # create a new rating:
+    new_rating_instance = {'restaurant': restaurant, 'rating': 4, 'comment': 'Very chill place and nice service.'}
+    
+    new_rating = models.Rating.create(**new_rating_instance)
+    
+    print(f"Rating added successfully for restaurant: '{restaurant.name}'."
+          f"Rating ID: {new_rating.id}")
+    
+    
+    
+    
+    
 
 
 def dinner_date_possible() -> List[models.Restaurant]:
