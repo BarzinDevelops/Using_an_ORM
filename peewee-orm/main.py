@@ -74,7 +74,7 @@ def add_rating_to_restaurant() -> None:
 
     Select the first restaurant in the dataset and add a rating
     """
-    restaurant = models.Restaurant.get_by_id(5)
+    restaurant = models.Restaurant.get_by_id(3)
     print(f"restaurant reference: {restaurant}\n Restaurant name: {restaurant.name}")
     # create a new rating:
     new_rating_instance = {'restaurant': restaurant, 'rating': 4, 'comment': 'Very chill place and nice service.'}
