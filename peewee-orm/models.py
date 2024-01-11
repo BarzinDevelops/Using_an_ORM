@@ -43,3 +43,5 @@ class Rating(peewee.Model):
 
 
 DishIngredient = Dish.ingredients.get_through_model()
+
+
