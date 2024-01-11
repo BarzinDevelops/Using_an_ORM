@@ -22,8 +22,8 @@ def tester():
     # adding_dish()
     # dinner_date_possible()
     print(add_dish_to_menu())
-    ingredient = models.Ingredient.get(models.Ingredient.name ** 'sosis')
-    print(f"Test: ingredient = {ingredient}")
+    # ingredient = models.Ingredient.get_or_none(models.Ingredient.name ** 'sosis')
+    # print(f"Test: ingredient = {ingredient}")
      
 def cheapest_dish() -> models.Dish:
     """You want ot get food on a budget
@@ -143,7 +143,7 @@ def add_dish(dish_name, restaurant_id, price_in_cents):
         
 def add_ingredients(name, is_vegetarian, is_vegan, is_glutenfree):
     # Check if the ingredient with the same name already exists
-    existing_ingredient = models.Ingredient.get(models.Ingredient.name == name)
+    existing_ingredient = models.Ingredient.get_or_none(models.Ingredient.name == name)
     if existing_ingredient:
         print(f"This ingredient: '{existing_ingredient.name}' already exists.")
         return existing_ingredient
